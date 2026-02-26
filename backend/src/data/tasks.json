@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "title": "Investigar fallo en login",
+    "agent": "Ana",
+    "status": "todo"
+  },
+  {
+    "id": 2,
+    "title": "Actualizar inventario",
+    "agent": "Luis",
+    "status": "inprogress"
+  },
+  {
+    "id": 3,
+    "title": "Deploy versión 1.2",
+    "agent": "Marta",
+    "status": "done"
+  }
+]

@@ -1,0 +1,74 @@
+
+:root{
+	--page-bg: #f8fafc;
+	--card:#ffffff;
+	--accent:#2563eb;
+	--text: #0f172a;
+	--muted: #6b7280;
+	--todo:#f3f4f6;
+	--inprogress:#fff7ed;
+	--done:#ecfdf5;
+	--status-foreground: #065f46;
+	--card-border: rgba(2,6,23,0.04);
+	--avatar-bg: #eef2ff;
+	--avatar-border: rgba(2,6,23,0.06);
+}
+.dark{
+	/* Dark theme palette chosen for good contrast */
+	--page-bg: #071027;        /* deep navy */
+	--card: #0b1220;           /* card background (slightly lighter) */
+	--accent: #60a5fa;        /* bright blue accent */
+	--text: #e6f0ff;          /* main text color */
+	--muted: #9fb0c9;         /* secondary text */
+	--todo: #0f1724;
+	--inprogress: #12202a;
+	--column-border: rgba(96,165,250,0.6);
+	--done: #072020;
+	--status-foreground: #bbf7d0; /* light green for status text */
+	--card-border: rgba(96,165,250,0.6); /* neon blue border in dark theme */
+	--avatar-bg: #081827;
+	--avatar-border: rgba(255,255,255,0.06);
+}
+
+body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial,Helvetica,sans-serif;background:var(--page-bg);color:var(--text)}
+.app{padding:20px 28px}
+.app-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.brand{display:flex;gap:12px;align-items:center}
+.brand-icon{font-size:36px;color:var(--text)}
+.brand-sub{font-size:12px;color:var(--muted)}
+
+.controls{display:flex;gap:8px;align-items:center}
+.theme-toggle{background:transparent;border:0;padding:6px;border-radius:8px;cursor:pointer;color:var(--text);font-size:18px}
+
+
+
+.board{display:flex;gap:18px;align-items:stretch;height:80vh}
+.column{flex:1;min-width:260px;background:transparent;display:flex;flex-direction:column;border:1px solid var(--column-border, rgba(2,6,23,0.04));border-radius:12px;padding:12px;box-sizing:border-box}
+.column-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.column-title{display:flex;gap:8px;align-items:center;font-weight:700}
+.col-icon{font-size:18px;color:var(--text)}
+.column-count{background:#e6eefc;padding:4px 8px;border-radius:999px;font-size:12px;color:#0f172a}
+
+.cards{display:flex;flex-direction:column;gap:12px;min-height:120px;flex:1;overflow:auto;padding:6px}
+.cards.empty{min-height:140px;display:flex;align-items:center;justify-content:center;color:var(--muted);border:1px dashed transparent;border-radius:8px}
+.cards.empty.dropping{border-color:rgba(96,165,250,0.35);background:linear-gradient(90deg, rgba(96,165,250,0.03), rgba(96,165,250,0.01));}
+.card{background:var(--card);padding:14px;border-radius:12px;border:1px solid var(--card-border);box-shadow:0 6px 18px rgba(2,6,23,0.04);transition:transform .16s cubic-bezier(.2,.9,.3,1),box-shadow .16s cubic-bezier(.2,.9,.3,1)}
+.card:hover{transform:translateY(-6px);box-shadow:0 16px 36px rgba(2,6,23,0.08)}
+.card.dragging{transform:scale(.995);box-shadow:0 18px 46px rgba(2,6,23,0.10)}
+.dark .card{box-shadow:0 10px 30px rgba(96,165,250,0.12);}
+.cards.dropping{background:linear-gradient(90deg, rgba(37,99,235,0.03), rgba(16,185,129,0.02));padding:10px;border-radius:12px}
+.avatar.img{width:44px;height:44px;border-radius:8px;object-fit:cover}
+.card-main{display:flex;gap:12px;align-items:flex-start}
+.avatar{width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--avatar-foreground, var(--text));background:var(--avatar-bg);border:1px solid var(--avatar-border);box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+.card-body{flex:1}
+.card-title{font-weight:700;margin-bottom:6px}
+.card-meta{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.status{padding:4px 8px;border-radius:999px;font-weight:600;font-size:12px;color:var(--status-foreground);background:transparent}
+.agent{background:var(--todo);padding:4px 8px;border-radius:8px;color:var(--text)}
+
+/* Make image avatars stand out in dark theme */
+.avatar.img{width:44px;height:44px;border-radius:8px;object-fit:cover;border:2px solid var(--avatar-border)}
+
+@media (max-width:900px){
+	.board{flex-direction:column}
+}
