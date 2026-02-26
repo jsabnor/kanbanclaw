@@ -1,29 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { HiSparkles, HiOutlineClock, HiOutlineCheck, HiSun, HiMoon } from 'react-icons/hi'
-// Using native HTML5 Drag and Drop to avoid extra dependency
-
-type Status = 'todo' | 'inprogress' | 'done'
-
-type Task = {
-  id: number
-  title: string
-  agent: string
-  status: Status
-}
-
-function initials(name: string) {
-  return name
-    .split(' ')
-    .map((s) => s[0]?.toUpperCase() ?? '')
-    .slice(0, 2)
-    .join('')
-}
-
-function statusColor(s: Status) {
-  if (s === 'todo') return 'var(--todo)'
-  if (s === 'inprogress') return 'var(--inprogress)'
-  return 'var(--done)'
-}
+import Header from './components/Header'
+import Board from './components/Board'
+import { Status, Task } from './types'
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -51,7 +29,7 @@ export default function App() {
 
     function hexToRgb(hex: string) {
       const h = hex.replace('#', '')
-      const bigint = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16)
+      const bigint = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16)
       return {
         r: (bigint >> 16) & 255,
         g: (bigint >> 8) & 255,
@@ -70,7 +48,7 @@ export default function App() {
     let rgb
     try {
       if (bg.startsWith('rgb')) {
-        const parts = bg.replace(/rgba?\(|\)/g, '').split(',').map(s => Number(s.trim()))
+        const parts = bg.replace(/rgba?\(|\)/g, '').split(',').map((s) => Number(s.trim()))
         rgb = { r: parts[0], g: parts[1], b: parts[2] }
       } else {
         rgb = hexToRgb(bg)
@@ -80,7 +58,6 @@ export default function App() {
     }
 
     const lum = luminance(rgb.r, rgb.g, rgb.b)
-    // wcag threshold for contrast with white is around 0.179
     const avatarText = lum > 0.5 ? '#0f172a' : '#e6f0ff'
     document.documentElement.style.setProperty('--avatar-foreground', avatarText)
   }, [theme])
@@ -95,12 +72,6 @@ export default function App() {
       .then(setTasks)
       .catch(console.error)
   }, [])
-
-  const columns: { key: Status; title: string; icon: React.ReactNode }[] = [
-    { key: 'todo', title: 'To Do', icon: <HiSparkles /> },
-    { key: 'inprogress', title: 'In Progress', icon: <HiOutlineClock /> },
-    { key: 'done', title: 'Done', icon: <HiOutlineCheck /> }
-  ]
 
   function handleDragStart(e: React.DragEvent, t: Task) {
     setDraggingId(t.id)
@@ -128,7 +99,6 @@ export default function App() {
     const { id, status: fromStatus } = payload
 
     if (fromStatus === destStatus) {
-      // reorder within same column
       const items = tasks.filter((t) => t.status === fromStatus)
       const other = tasks.filter((t) => t.status !== fromStatus)
       const idx = items.findIndex((it) => it.id === id)
@@ -140,76 +110,16 @@ export default function App() {
       return
     }
 
-    // move between columns
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, status: destStatus } : t)))
     setDraggingId(null)
   }
 
   return (
     <div className="app">
-      <header className="app-header">
-        <div className="brand">
-          <HiSparkles className="brand-icon" />
-          <div>
-            <div className="brand-title">kanbanclaw</div>
-            <div className="brand-sub">Kanban de tareas de agentes</div>
-          </div>
-        </div>
-        <div className="controls">
-          <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
-            {theme === 'light' ? <HiMoon /> : <HiSun />}
-          </button>
-        </div>
-      </header>
+      <Header theme={theme} toggleTheme={toggleTheme} />
 
       <main>
-          <div className="board">
-            {columns.map((col) => (
-              <section
-                className="column"
-                key={col.key}
-                onDragOver={(e) => handleDragOver(e, col.key)}
-                onDrop={(e) => handleDrop(e, col.key)}
-              >
-                <div className="column-header">
-                  <div className="column-title">
-                    <span className="col-icon">{col.icon}</span>
-                    <span>{col.title}</span>
-                  </div>
-                  <div className="column-count">{tasks.filter((t) => t.status === col.key).length}</div>
-                </div>
-
-                <div className={`cards ${tasks.filter((t) => t.status === col.key).length === 0 ? 'empty' : ''} ${dragOverColumn === col.key ? 'dropping' : ''}`}>
-                  {tasks
-                    .filter((t) => t.status === col.key)
-                    .map((t, index) => (
-                      <article
-                        key={t.id}
-                        className={`card ${draggingId === t.id ? 'dragging' : ''}`}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, t)}
-                        onDragEnd={() => setDraggingId(null)}
-                      >
-                        <div className="card-main">
-                          {t.agent && t.agent.startsWith('http') ? (
-                            <img className="avatar img" src={t.agent} alt={t.agent} />
-                          ) : (
-                            <div className="avatar" style={{ background: '#eef2ff' }}>{initials(t.agent)}</div>
-                          )}
-                          <div className="card-body">
-                            <div className="card-title">{t.title}</div>
-                            <div className="card-meta">
-                              <span className="agent">{t.agent}</span>
-                              <span className="status" style={{ background: statusColor(t.status) }}>{t.status}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </article>
-                    ))}
-                </div>
-              </section>
-            ))}
-          </div>
+        <Board tasks={tasks} draggingId={draggingId} onDragOver={handleDragOver} onDrop={handleDrop} onDragStart={handleDragStart} />
       </main>
     </div>
   )
