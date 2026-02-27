@@ -19,11 +19,60 @@ async function ensureInit() {
   }
 }
 
+async function readTasks(): Promise<Task[]> {
+  await ensureInit()
+  const txt = await fs.readFile(tasksFile, 'utf8')
+  return JSON.parse(txt) as Task[]
+}
+
+async function writeTasks(tasks: Task[]) {
+  await fs.writeFile(tasksFile, JSON.stringify(tasks, null, 2), 'utf8')
+}
+
 const jsonStorage: Storage = {
   async getAllTasks() {
-    await ensureInit()
-    const txt = await fs.readFile(tasksFile, 'utf8')
-    return JSON.parse(txt) as Task[]
+    return readTasks()
+  },
+
+  async createTask(input) {
+    const tasks = await readTasks()
+    const maxId = tasks.reduce((m, t) => Math.max(m, t.id), 0)
+    const next = maxId + 1
+    const newTask: Task = {
+      id: next,
+      title: input.title,
+      agent: input.agent || '',
+      status: (input.status as string) || 'backlog'
+    }
+    tasks.push(newTask)
+    await writeTasks(tasks)
+    return newTask
+  },
+
+  async updateTask(id) {
+    const patch = arguments[1] as Partial<Task>
+    const tasks = await readTasks()
+    const idx = tasks.findIndex((t) => t.id === id)
+    if (idx === -1) return null
+    const updated = { ...tasks[idx], ...patch }
+    tasks[idx] = updated
+    await writeTasks(tasks)
+    return updated
+  },
+
+  async deleteTask(id) {
+    const tasks = await readTasks()
+    const filtered = tasks.filter((t) => t.id !== id)
+    if (filtered.length === tasks.length) return false
+    await writeTasks(filtered)
+    return true
+  },
+
+  async getAgents() {
+    const tasks = await readTasks()
+    const set = new Set<string>()
+    tasks.forEach((t) => { if (t.agent) set.add(t.agent) })
+    return Array.from(set)
   }
 }
 

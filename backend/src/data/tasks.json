@@ -16,5 +16,23 @@
     "title": "Deploy versión 1.2",
     "agent": "Marta",
     "status": "done"
+  },
+  {
+    "id": 4,
+    "title": "Nuevo item",
+    "agent": "Pedro",
+    "status": "backlog"
+  },
+  {
+    "id": 5,
+    "title": "Hacer un endpoint",
+    "agent": "Marta",
+    "status": "todo"
+  },
+  {
+    "id": 6,
+    "title": "nuevo endpoint para configuraciones",
+    "agent": "Marta",
+    "status": "backlog"
   }
 ]

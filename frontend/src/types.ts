@@ -1,4 +1,9 @@
-export type Status = 'todo' | 'inprogress' | 'done'
+export type Status = 'backlog' | 'todo' | 'inprogress' | 'done'
+
+export type Column = {
+  key: Status | string
+  title: string
+}
 
 export type Task = {
   id: number
@@ -16,6 +21,7 @@ export function initials(name: string) {
 }
 
 export function statusColor(s: Status) {
+  if (s === 'backlog') return 'var(--muted)'
   if (s === 'todo') return 'var(--todo)'
   if (s === 'inprogress') return 'var(--inprogress)'
   return 'var(--done)'

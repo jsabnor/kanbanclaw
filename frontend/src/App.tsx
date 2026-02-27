@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Header from './components/Header'
 import Board from './components/Board'
 import { Status, Task } from './types'
+import TaskForm from './components/TaskForm'
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -73,6 +74,63 @@ export default function App() {
       .catch(console.error)
   }, [])
 
+  const [formOpen, setFormOpen] = useState(false)
+  const [formTask, setFormTask] = useState<Partial<Task> | null>(null)
+  const [formDefaultStatus, setFormDefaultStatus] = useState<string | undefined>(undefined)
+
+  function openCreate(status: string) {
+    setFormTask(null)
+    setFormDefaultStatus(status)
+    setFormOpen(true)
+  }
+
+  function openEdit(t: Task) {
+    setFormTask(t)
+    setFormDefaultStatus(t.status)
+    setFormOpen(true)
+  }
+
+  function closeForm() {
+    setFormOpen(false)
+    setFormTask(null)
+    setFormDefaultStatus(undefined)
+  }
+
+  async function submitForm(payload: { title: string; agent?: string; status?: string }) {
+    try {
+      if (formTask && formTask.id) {
+        const res = await fetch(`/api/tasks/${formTask.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        const updated = await res.json()
+        setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
+      } else {
+        const res = await fetch('/api/tasks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        const created = await res.json()
+        setTasks((prev) => [...prev, created])
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      closeForm()
+    }
+  }
+
+  async function handleDelete(id: number) {
+    try {
+      await fetch(`/api/tasks/${id}`, { method: 'DELETE' })
+      setTasks((prev) => prev.filter((t) => t.id !== id))
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   function handleDragStart(e: React.DragEvent, t: Task) {
     setDraggingId(t.id)
     e.dataTransfer.setData('text/plain', JSON.stringify({ id: t.id, status: t.status }))
@@ -119,7 +177,19 @@ export default function App() {
       <Header theme={theme} toggleTheme={toggleTheme} />
 
       <main>
-        <Board tasks={tasks} draggingId={draggingId} onDragOver={handleDragOver} onDrop={handleDrop} onDragStart={handleDragStart} />
+        <Board
+          tasks={tasks}
+          draggingId={draggingId}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          onDragStart={handleDragStart}
+          onCreate={openCreate}
+          onEdit={openEdit}
+          onDelete={handleDelete}
+        />
+        {formOpen && (
+          <TaskForm initial={formTask || undefined} defaultStatus={formDefaultStatus as any} onCancel={closeForm} onSubmit={submitForm} />
+        )}
       </main>
     </div>
   )
