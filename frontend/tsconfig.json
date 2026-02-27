@@ -4,6 +4,7 @@
     "useDefineForClassFields": true,
     "lib": ["DOM", "ESNext"],
     "module": "ESNext",
+    "ignoreDeprecations": "6.0",
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,

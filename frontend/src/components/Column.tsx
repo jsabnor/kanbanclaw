@@ -11,9 +11,12 @@ type Props = {
   onDragOver: (e: React.DragEvent, col: Status) => void
   onDrop: (e: React.DragEvent, destStatus: Status, destIndex?: number) => void
   onDragStart: (e: React.DragEvent, t: Task) => void
+  onCreate?: (status: string) => void
+  onEdit?: (t: Task) => void
+  onDelete?: (id: number) => void
 }
 
-export default function Column({ col, tasks, draggingId, onDragOver, onDrop, onDragStart }: Props) {
+export default function Column({ col, tasks, draggingId, onDragOver, onDrop, onDragStart, onCreate, onEdit, onDelete }: Props) {
   const empty = tasks.length === 0
 
   return (
@@ -24,11 +27,20 @@ export default function Column({ col, tasks, draggingId, onDragOver, onDrop, onD
           <span>{col.title}</span>
         </div>
         <div className="column-count">{tasks.length}</div>
+        <button className="add-btn" onClick={() => onCreate?.(col.key)}>+</button>
       </div>
 
       <div className={`cards ${empty ? 'empty' : ''}`}>
         {tasks.map((t) => (
-          <Card key={t.id} t={t} draggingId={draggingId} onDragStart={onDragStart} onDragEnd={() => {}} />
+          <Card
+            key={t.id}
+            t={t}
+            draggingId={draggingId}
+            onDragStart={onDragStart}
+            onDragEnd={() => {}}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
         ))}
       </div>
     </section>
